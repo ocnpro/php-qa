@@ -105,5 +105,6 @@
         "post-update-cmd": [
             "PhpQa\\Composer\\DevelopmentIntegrator::integrate"
         ]
-    }
+    },
+    "license": "MIT"
 }
