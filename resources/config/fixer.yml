@@ -1,0 +1,5 @@
+services:
+    PhpQa\Fixer\FixerUpper:
+        arguments:
+            - '@grumphp.io'
+            - '@PhpQa\Configuration\Model\FixerConfig'

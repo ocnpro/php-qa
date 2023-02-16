@@ -1,0 +1,48 @@
+services:
+    PhpQa\Locator\AsciiLocator:
+        arguments:
+            - '@PhpQa\Configuration\Model\AsciiConfig'
+            - '@filesystem'
+            - '@PhpQa\Util\Paths'
+
+    PhpQa\Locator\ExternalCommand:
+        class:
+        factory: ['PhpQa\Locator\ExternalCommand', 'loadWithPaths']
+        arguments:
+            - '@PhpQa\Util\Paths'
+            - '@executable_finder'
+
+    PhpQa\Locator\ChangedFiles:
+        arguments:
+            - '@PhpQa\Git\GitRepository'
+            - '@filesystem'
+            - '@PhpQa\Util\Paths'
+
+    PhpQa\Locator\ListedFiles:
+        arguments:
+            - '@PhpQa\Util\Paths'
+
+    PhpQa\Locator\RegisteredFiles:
+        arguments:
+            - '@PhpQa\Git\GitRepository'
+            - '@PhpQa\Util\Paths'
+            - '@PhpQa\Locator\ListedFiles'
+
+    PhpQa\Locator\StdInFiles:
+        arguments:
+            - '@PhpQa\Locator\ChangedFiles'
+            - '@PhpQa\Locator\ListedFiles'
+
+    PhpQa\Locator\GitWorkingDirLocator:
+        arguments:
+            - '@executable_finder'
+    PhpQa\Locator\GitRepositoryDirLocator:
+        arguments:
+            - '@grumphp.util.filesystem'
+    PhpQa\Locator\GitRepositoryLocator:
+        arguments:
+            - '@PhpQa\Util\Paths'
+    PhpQa\Locator\EnrichedGuessedPathsFromDotEnvLocator:
+        public: true
+        arguments:
+            - '@grumphp.util.filesystem'

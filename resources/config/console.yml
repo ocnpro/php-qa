@@ -1,0 +1,68 @@
+services:
+    #
+    # Cli Application
+    #
+    PhpQa\Console\Application:
+        class: Symfony\Component\Console\Application
+        calls:
+            - { method: 'setDispatcher', arguments: ['@Symfony\Component\EventDispatcher\EventDispatcher'] }
+            - { method: 'setCommandLoader', arguments: ['@console.command_loader'] }
+        configurator: ['@PhpQa\Console\ApplicationConfigurator', 'configure']
+        public: true
+
+    PhpQa\Console\ApplicationConfigurator: ~
+
+    #
+    # Commands
+    #
+    PhpQa\Console\Command\ConfigureCommand:
+        arguments:
+            - '@PhpQa\Configuration\Resolver\TaskConfigResolver'
+            - '@grumphp.util.filesystem'
+            - '@PhpQa\Util\Paths'
+        tags:
+            - { name: 'console.command' }
+    PhpQa\Console\Command\RunCommand:
+        arguments:
+            - '@PhpQa\Collection\TestSuiteCollection'
+            - '@PhpQa\Locator\StdInFiles'
+            - '@PhpQa\Locator\RegisteredFiles'
+            - '@PhpQa\Runner\TaskRunner'
+        tags:
+            - { name: 'console.command' }
+    PhpQa\Console\Command\Git\CommitMsgCommand:
+        arguments:
+            - '@PhpQa\Collection\TestSuiteCollection'
+            - '@PhpQa\Locator\StdInFiles'
+            - '@PhpQa\Locator\ChangedFiles'
+            - '@PhpQa\Runner\TaskRunner'
+            - '@grumphp.util.filesystem'
+            - '@PhpQa\Util\Paths'
+        tags:
+            - { name: 'console.command' }
+    PhpQa\Console\Command\Git\DeInitCommand:
+        arguments:
+            - '@grumphp.util.filesystem'
+            - '@PhpQa\Util\Paths'
+        tags:
+            - { name: 'console.command' }
+    PhpQa\Console\Command\Git\InitCommand:
+        arguments:
+            - '@PhpQa\Configuration\Model\HooksConfig'
+            - '@grumphp.util.filesystem'
+            - '@process_builder'
+            - '@PhpQa\Util\Paths'
+        tags:
+            - { name: 'console.command' }
+    PhpQa\Console\Command\Git\PreCommitCommand:
+        arguments:
+            - '@PhpQa\Collection\TestSuiteCollection'
+            - '@PhpQa\Locator\StdInFiles'
+            - '@PhpQa\Locator\ChangedFiles'
+            - '@PhpQa\Runner\TaskRunner'
+        tags:
+            - { name: 'console.command' }
+
+    # This one is loaded through the TestSuiteCompilerPass
+    PhpQa\Collection\TestSuiteCollection:
+        synthetic: true

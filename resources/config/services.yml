@@ -1,0 +1,74 @@
+services:
+    PhpQa\Configuration\GuessedPaths:
+        class: PhpQa\Configuration\GuessedPaths
+        synthetic: true
+        public: true
+
+    Symfony\Component\EventDispatcher\EventDispatcher: ~
+    event_dispatcher: '@Symfony\Component\EventDispatcher\EventDispatcher'
+    PhpQa\Event\Dispatcher\Bridge\SymfonyEventDispatcher:
+        arguments:
+            - '@Symfony\Component\EventDispatcher\EventDispatcher'
+    PhpQa\Configuration\Resolver\TaskConfigResolver:
+        synthetic: true
+
+    PhpQa\Event\Dispatcher\EventDispatcherInterface: '@PhpQa\Event\Dispatcher\Bridge\SymfonyEventDispatcher'
+
+    filesystem:
+        alias: grumphp.util.filesystem
+
+    executable_finder:
+        class: Symfony\Component\Process\ExecutableFinder
+        calls:
+            - { method: 'setSuffixes', arguments: [['.phar', '.exe', '.bat', '.cmd', '.com']] }
+
+    process_builder:
+      class: PhpQa\Process\ProcessBuilder
+      arguments:
+        - '@PhpQa\Locator\ExternalCommand'
+        - '@grumphp.io'
+        - '@PhpQa\Configuration\Model\ProcessConfig'
+      public: true
+
+    PhpQa\Git\GitRepository:
+        arguments:
+            - '@PhpQa\Locator\GitRepositoryLocator'
+            -
+                logger: '@grumphp.logger'
+                inherit_environment_variables: true
+
+    grumphp.io:
+        alias: grumphp.io.console
+
+    grumphp.io.console:
+        class: PhpQa\IO\ConsoleIO
+        arguments:
+          - '@console.input'
+          - '@console.output'
+        public: true
+
+    grumphp.logger:
+        class: Monolog\Logger
+        arguments:
+          - 'PhpQa'
+          - ['@grumphp.logger.handler.nullhandler']
+        public: true
+
+    grumphp.logger.handler.nullhandler:
+        class: Monolog\Handler\NullHandler
+        public: false
+
+    console.input:
+        class: Symfony\Component\Console\Input\ArgvInput
+        synthetic: true
+        public: true
+
+    console.output:
+        class: Symfony\Component\Console\Output\ConsoleOutput
+        synthetic: true
+        public: true
+
+    json.parser:
+        class: Seld\JsonLint\JsonParser
+
+    PhpQa\Configuration\Configurator\TaskConfigurator: ~

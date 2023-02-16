@@ -1,0 +1,6 @@
+suites:
+  default:
+    namespace: PhpQa
+    psr4_prefix: PhpQa
+
+formatter.name: pretty

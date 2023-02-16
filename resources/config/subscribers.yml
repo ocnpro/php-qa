@@ -1,0 +1,17 @@
+services:
+  subscriber.stash_unstaged_changes:
+    class: PhpQa\Event\Subscriber\StashUnstagedChangesSubscriber
+    arguments:
+      - '@PhpQa\Configuration\Model\GitStashConfig'
+      - '@PhpQa\Git\GitRepository'
+      - '@grumphp.io'
+    tags:
+      - { name: grumphp.event_subscriber }
+    public: true
+
+  PhpQa\Event\Subscriber\VerboseLoggerSubscriber:
+    arguments:
+      - '@grumphp.logger'
+      - '@PhpQa\Configuration\GuessedPaths'
+    tags:
+      - { name: grumphp.event_subscriber }

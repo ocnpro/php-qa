@@ -1,0 +1,121 @@
+services:
+    PhpQa\Collection\TasksCollection: ~
+    PhpQa\Runner\TaskRunner:
+        class:
+        arguments:
+            - '@PhpQa\Collection\TasksCollection'
+            - '@PhpQa\Runner\MiddlewareStack'
+    PhpQa\Runner\MiddlewareStack:
+        factory: ['PhpQa\Runner\MiddlewareStack', 'fromIterable']
+        arguments:
+            - !tagged 'grumphp.runner_middleware'
+
+    PhpQa\Runner\TaskHandler\TaskHandler:
+        factory: ['PhpQa\Runner\TaskHandler\TaskHandler', 'fromIterable']
+        arguments:
+            - !tagged 'grumphp.task_handler'
+
+    #
+    # Runner middleware
+    #
+    PhpQa\Runner\Middleware\FixCodeMiddleware:
+        arguments:
+            - '@PhpQa\Fixer\FixerUpper'
+        tags:
+            - { name: 'grumphp.runner_middleware', priority: 1000 }
+    PhpQa\Runner\Middleware\TasksFilteringRunnerMiddleware:
+        arguments: []
+        tags:
+            - { name: 'grumphp.runner_middleware', priority: 900 }
+    PhpQa\Runner\Middleware\ReportingRunnerMiddleware:
+        arguments:
+            - '@PhpQa\Runner\Reporting\RunnerReporter'
+        tags:
+            - { name: 'grumphp.runner_middleware', priority: 800 }
+    PhpQa\Runner\Middleware\EventDispatchingRunnerMiddleware:
+        arguments:
+            - '@PhpQa\Event\Dispatcher\Bridge\SymfonyEventDispatcher'
+        tags:
+            - { name: 'grumphp.runner_middleware', priority: 500 }
+    PhpQa\Runner\Middleware\GroupByPriorityMiddleware:
+        arguments:
+            - '@grumphp.io'
+            - '@PhpQa\Configuration\Model\RunnerConfig'
+        tags:
+            - { name: 'grumphp.runner_middleware', priority: 250 }
+    PhpQa\Runner\Middleware\ReportingTasksSectionRunnerMiddleware:
+        arguments:
+            - '@PhpQa\Runner\Reporting\TaskResultsReporter'
+        tags:
+            - { name: 'grumphp.runner_middleware', priority: 150 }
+    PhpQa\Runner\Middleware\HandleRunnerMiddleware:
+        arguments:
+            - '@PhpQa\Runner\TaskHandler\TaskHandler'
+            - '@PhpQa\Configuration\Model\RunnerConfig'
+        tags:
+            - { name: 'grumphp.runner_middleware', priority: 0 }
+
+    #
+    # Task handler middleware
+    #
+    PhpQa\Runner\TaskHandler\Middleware\EventDispatchingTaskHandlerMiddleware:
+        arguments:
+            - '@PhpQa\Event\Dispatcher\Bridge\SymfonyEventDispatcher'
+        tags:
+            - { name: 'grumphp.task_handler', priority: 1000 }
+    PhpQa\Runner\TaskHandler\Middleware\ReportingTaskHandlerMiddleware:
+        arguments:
+            - '@PhpQa\Runner\Reporting\TaskResultsReporter'
+        tags:
+            - { name: 'grumphp.task_handler', priority: 750}
+    PhpQa\Runner\TaskHandler\Middleware\MemoizedResultsTaskHandlerMiddleware:
+        arguments:
+            - '@PhpQa\Runner\MemoizedTaskResultMap'
+        tags:
+            - { name: 'grumphp.task_handler', priority: 500 }
+    PhpQa\Runner\TaskHandler\Middleware\NonBlockingTaskHandlerMiddleware:
+        arguments: ~
+        tags:
+            - { name: 'grumphp.task_handler', priority: 250 }
+    PhpQa\Runner\TaskHandler\Middleware\ParallelProcessingMiddleware:
+        arguments:
+            - '@PhpQa\Configuration\Model\ParallelConfig'
+            - '@PhpQa\Runner\Parallel\PoolFactory'
+            - '@grumphp.io'
+        tags:
+            - { name: 'grumphp.task_handler', priority: 150 }
+    PhpQa\Runner\TaskHandler\Middleware\ErrorHandlingTaskHandlerMiddleware:
+        arguments: ~
+        tags:
+            - { name: 'grumphp.task_handler', priority: 0 }
+
+    #
+    # Configurable Parallel Pool
+    #
+    PhpQa\Runner\Parallel\PoolFactory:
+        arguments:
+            - '@PhpQa\Configuration\Model\ParallelConfig'
+
+    #
+    # Reporting
+    #
+    PhpQa\Runner\MemoizedTaskResultMap:
+        arguments: []
+    PhpQa\Runner\Reporting\RunnerReporter:
+        arguments:
+            - '@grumphp.io'
+            - '@PhpQa\Locator\AsciiLocator'
+            - '@PhpQa\Configuration\Model\RunnerConfig'
+    PhpQa\Runner\Reporting\TaskResultsReporter:
+        arguments:
+            - '@grumphp.io'
+            - '@PhpQa\Runner\MemoizedTaskResultMap'
+            - '@PhpQa\Runner\Ci\CiDetector'
+
+    #
+    # CI Detection
+    #
+    PhpQa\Runner\Ci\CiDetector:
+        arguments:
+            - '@OndraM\CiDetector\CiDetector'
+    OndraM\CiDetector\CiDetector: ~

@@ -1,0 +1,11 @@
+services:
+    formatter.raw_process:
+        class: PhpQa\Formatter\RawProcessFormatter
+    formatter.phpcsfixer:
+        class: PhpQa\Formatter\PhpCsFixerFormatter
+    formatter.phpcs:
+        class: PhpQa\Formatter\PhpcsFormatter
+    formatter.git_blacklist:
+        class: PhpQa\Formatter\GitBlacklistFormatter
+        arguments:
+            - '@grumphp.io'
