@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^7.0",
         "ext-json": "*",
         "composer-plugin-api": "~2.0",
         "amphp/amp": "^2.6",
